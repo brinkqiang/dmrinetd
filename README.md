@@ -10,8 +10,8 @@ rinetd, port mapped tools
 To get the latest source code:
 
 ```bash
-git clone https://github.com/brinkqiang/rinetd.git
-pushd rinetd
+git clone https://github.com/brinkqiang/dmrinetd.git
+pushd dmrinetd
 yum install gettext gcc autoconf libtool automake make asciidoc xmlto c-ares-devel libev-devel
 
 sudo libtoolize && sudo aclocal && sudo autoheader && sudo autoconf && sudo automake --add-missing
