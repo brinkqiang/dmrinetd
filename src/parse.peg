@@ -1,0 +1,183 @@
+#  Copyright © 1997—1999 Thomas Boutell <boutell@boutell.com>
+#                        and Boutell.Com, Inc.
+#            © 2003—2017 Sam Hocevar <sam@hocevar.net>
+#
+#  This software is released for free use under the terms of
+#  the GNU Public License, version 2 or higher. NO WARRANTY
+#  IS EXPRESSED OR IMPLIED. USE THIS SOFTWARE AT YOUR OWN RISK. */
+
+%{
+#if HAVE_CONFIG_H
+#	include <config.h>
+#endif
+
+#include "net.h"
+#include "types.h"
+#include "rinetd.h"
+#include "parse.h"
+
+#define YY_CTX_LOCAL 1
+#define YY_CTX_MEMBERS \
+	FILE *fp; \
+	int currentLine; \
+	int isAuthAllow; \
+	char *tmpPort; \
+	int tmpPortNum, tmpProto; \
+	int bindPortNum, bindProto, connectPortNum, connectProto; \
+	int serverTimeout; \
+	char *bindAddress, *connectAddress, *sourceAddress;
+#define YY_INPUT(yyctx, buf, result, max_size) \
+{ \
+	int yyc = fgetc(yyctx->fp); \
+	result = (EOF == yyc) ? 0 : (*(buf) = yyc, 1); \
+}
+#define PARSE_ERROR exit(1);
+
+#if defined __clang__
+#pragma clang diagnostic ignored "-Wunused-parameter"
+#pragma clang diagnostic ignored "-Wunused-label"
+#elif defined __GNUC__
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+#pragma GCC diagnostic ignored "-Wunused-label"
+#endif
+
+%}
+
+file     =  (sol (line eol | invalid-syntax))*
+line     =  -? (command -?)? comment?
+command  =  (server-rule | auth-rule | logfile | pidlogfile | logcommon)
+comment  =  "#" (!eol .)*
+
+server-rule  =  bind-address - bind-port - connect-address - connect-port (-? server-options)?
+{
+	addServer(yy->bindAddress, yy->bindPortNum, yy->bindProto,
+		yy->connectAddress, yy->connectPortNum, yy->connectProto,
+		yy->serverTimeout > 0 ? yy->serverTimeout : RINETD_DEFAULT_UDP_TIMEOUT,
+		yy->sourceAddress);
+	yy->bindAddress = yy->connectAddress = yy->sourceAddress = NULL;
+	yy->serverTimeout = 0;
+}
+
+bind-address     =  < address > { yy->bindAddress = strdup(yytext); }
+connect-address  =  < address > { yy->connectAddress = strdup(yytext); }
+bind-port        =  full-port { yy->bindPortNum = yy->tmpPortNum; yy->bindProto = yy->tmpProto; }
+connect-port     =  full-port { yy->connectPortNum = yy->tmpPortNum; yy->connectProto = yy->tmpProto; }
+server-options   =  "[" -? option-list -? "]"
+
+option-list     =  option (-? ',' -? option-list)?
+option          =  (option-timeout | option-source)
+option-timeout  =  "timeout" -? "=" -? < number >    { yy->serverTimeout = atoi(yytext); }
+option-source   =  "src"     -? "=" -? < address >   { yy->sourceAddress = strdup(yytext); }
+
+full-port  =  port proto
+{
+	char const *proto = yy->tmpProto == protoTcp ? "tcp" : "udp";
+	struct servent *service = getservbyname(yy->tmpPort, proto);
+	yy->tmpPortNum = service ? ntohs(service->s_port) : atoi(yy->tmpPort);
+	if (yy->tmpPortNum == 0 || yy->tmpPortNum >= 65536) {
+		syslog(LOG_ERR, "port %s/%s missing or out of range\n", yy->tmpPort, proto);
+		PARSE_ERROR;
+	}
+}
+
+port   = < (number | service) >   { yy->tmpPort = strdup(yytext); }
+proto  = '/tcp'                   { yy->tmpProto = protoTcp; }
+       | '/udp'                   { yy->tmpProto = protoUdp; }
+       | ''                       { yy->tmpProto = protoTcp; }
+
+auth-rule  =  auth-key - < pattern >
+{
+	allRules = (Rule *)
+		realloc(allRules, sizeof(Rule) * (allRulesCount + 1));
+	if (!allRules) {
+		PARSE_ERROR;
+	}
+	allRules[allRulesCount].pattern = strdup(yytext);
+	if (!allRules[allRulesCount].pattern) {
+		PARSE_ERROR;
+	}
+	allRules[allRulesCount].type = yy->isAuthAllow ? allowRule : denyRule;
+	if (seTotal > 0) {
+		if (seInfo[seTotal - 1].rulesStart == 0) {
+			seInfo[seTotal - 1].rulesStart = allRulesCount;
+		}
+		++seInfo[seTotal - 1].rulesCount;
+	} else {
+		++globalRulesCount;
+	}
+	++allRulesCount;
+}
+
+auth-key = < ("allow" | "deny") >         { yy->isAuthAllow = (yytext[0] == 'a'); }
+
+logfile  =  "logfile" - < filename >
+{
+	logFileName = strdup(yytext);
+	if (!logFileName) {
+		PARSE_ERROR;
+	}
+}
+
+pidlogfile  =  "pidlogfile" - < filename >
+{
+	pidLogFileName = strdup(yytext);
+	if (!pidLogFileName) {
+		PARSE_ERROR;
+	}
+}
+
+logcommon  =  "logcommon"
+{
+	logFormatCommon = 1;
+}
+
+invalid_syntax  =  < (!eol .)+ > eol
+{
+	fprintf(stderr, "rinetd: invalid syntax at line %d: %s\n",
+	        yy->currentLine, yytext);
+	PARSE_ERROR; /* FIXME */
+}
+
+service  =  name
+address  =  ipv4 | hostname  # TODO: IPV6
+pattern  =  [0-9*?]+ ('.' [0-9*?]+ ('.' [0-9*?]+ ('.' [0-9*?]+)?)?)?
+number   =  digit+
+
+ipv4     =  number '.' number '.' number '.' number | '0'
+hostname =  ([-0-9a-zA-Z_]+ '.')* [a-zA-Z][-0-9a-zA-Z_]* '.'?
+
+
+name     =  [a-zA-Z][a-zA-Z0-9_]*
+filename =  '"' [^"]+ '"'
+         | [^ \t\r\n]+
+
+-        =  [ \t]+
+digit    =  [0-9]
+sol      =  { ++yy->currentLine; }
+eol      =  '\r'? '\n' | eof
+eof      =  '\0'
+
+%%
+
+void parseConfiguration(char const *file)
+{
+	FILE *in = fopen(file, "r");
+	if (!in) {
+		PARSE_ERROR;
+	}
+
+	yycontext ctx;
+	memset(&ctx, 0, sizeof(yycontext));
+	ctx.fp = in;
+	if (!yyparse(&ctx)) {
+		syslog(LOG_ERR, "invalid syntax "
+			"on file %s, line %d.\n", file, -1);
+		exit(1);
+	}
+
+	fclose(in);
+
+	/* Avoid warnings for these unused functions */
+	(void)yySet; (void)yyPush; (void)yyPop; (void)yyAccept;
+}
+
