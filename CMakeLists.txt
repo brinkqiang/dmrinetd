@@ -38,6 +38,19 @@ ENDIF ()
 
 ADD_DEFINITIONS(-DUSE_DMRINETD)
 
+include(CheckFunctionExists)
+include(CheckIncludeFile)
+include(CheckIncludeFiles)
+include(CheckLibraryExists)
+include(CheckSymbolExists)
+include(CheckTypeSize)
+include(CheckCSourceCompiles)
+include(CMakeDependentOption)
+
+check_include_file("errno.h"   HAVE_ERRNO_H)
+check_include_file("unistd.h"   HAVE_UNISTD_H)
+
+unistd.h
 IF (WIN32)
     INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/src/windows)
 ENDIF(WIN32)
