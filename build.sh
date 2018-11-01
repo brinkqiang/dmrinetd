@@ -3,6 +3,7 @@
 # - install depends tools
 # yum -y install git
 # yum -y install gcc gcc-c++ autoconf libtool automake make
+yum -y install gettext gcc autoconf libtool automake make asciidoc xmlto c-ares-devel libev-devel
 #
 
 # - clone code
@@ -11,17 +12,15 @@
 # git submodule update --init --recursive
 #
 
-# pushd thirdparty/depends_path
-# libtoolize && aclocal && autoheader && autoconf && automake --add-missing
-# sh configure
-# popd
+libtoolize && aclocal && autoheader && autoconf && automake --add-missing
+sh configure
+make
+make install
 
-rm -rf build
-mkdir build
-pushd build
-cmake -DCMAKE_BUILD_TYPE=relwithdebinfo ..
-cmake --build .
-popd
+cp ./rinetd.conf /usr/local/etc/rinetd.conf
+# vim /etc/rc.d/rc.local
+# rinetd -c /usr/local/etc/rinetd.conf &
+# vim /usr/local/etc/rinetd.conf
 
 # popd
 
