@@ -50,7 +50,6 @@ include(CMakeDependentOption)
 check_include_file("errno.h"   HAVE_ERRNO_H)
 check_include_file("unistd.h"   HAVE_UNISTD_H)
 
-unistd.h
 IF (WIN32)
     INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/src/windows)
 ENDIF(WIN32)
