@@ -1,0 +1,136 @@
+/* src/config.h.in.  Generated from configure.ac by autoheader.  */
+
+/* Define to 1 if you have the <arpa/inet.h> header file. */
+#cmakedefine HAVE_ARPA_INET_H
+
+/* Define to 1 if you have the `daemon' function. */
+#cmakedefine HAVE_DAEMON
+
+/* Define to 1 if you have the <errno.h> header file. */
+#cmakedefine HAVE_ERRNO_H
+
+/* Define to 1 if you have the <fcntl.h> header file. */
+#cmakedefine HAVE_FCNTL_H
+
+/* Define to 1 if you have the `fork' function. */
+#cmakedefine HAVE_FORK
+
+/* Define to 1 if you have the `gethostbyname' function. */
+#cmakedefine HAVE_GETHOSTBYNAME
+
+/* Define to 1 if you have the <inttypes.h> header file. */
+#cmakedefine HAVE_INTTYPES_H
+
+/* Define to 1 if you have the <memory.h> header file. */
+#cmakedefine HAVE_MEMORY_H
+
+/* Define to 1 if you have the `memset' function. */
+#cmakedefine HAVE_MEMSET
+
+/* Define to 1 if you have the <netdb.h> header file. */
+#cmakedefine HAVE_NETDB_H
+
+/* Define to 1 if you have the <netinet/in.h> header file. */
+#cmakedefine HAVE_NETINET_IN_H
+
+/* Define to 1 if you have the `select' function. */
+#cmakedefine HAVE_SELECT
+
+/* Define to 1 if you have the `sigaction' function. */
+#cmakedefine HAVE_SIGACTION
+
+/* Define to 1 if you have the `socket' function. */
+#cmakedefine HAVE_SOCKET
+
+/* Define to 1 if the system has the type `socklen_t'. */
+#cmakedefine HAVE_SOCKLEN_T
+
+/* Define to 1 if you have the <stdint.h> header file. */
+#cmakedefine HAVE_STDINT_H
+
+/* Define to 1 if you have the <stdlib.h> header file. */
+#cmakedefine HAVE_STDLIB_H
+
+/* Define to 1 if you have the `strftime' function. */
+#cmakedefine HAVE_STRFTIME
+
+/* Define to 1 if you have the <strings.h> header file. */
+#cmakedefine HAVE_STRINGS_H
+
+/* Define to 1 if you have the <string.h> header file. */
+#cmakedefine HAVE_STRING_H
+
+/* Define to 1 if you have the `strstr' function. */
+#cmakedefine HAVE_STRSTR
+
+/* Define to 1 if you have the <syslog.h> header file. */
+#cmakedefine HAVE_SYSLOG_H
+
+/* Define to 1 if you have the <sys/ioctl.h> header file. */
+#cmakedefine HAVE_SYS_IOCTL_H
+
+/* Define to 1 if you have the <sys/socket.h> header file. */
+#cmakedefine HAVE_SYS_SOCKET_H
+
+/* Define to 1 if you have the <sys/stat.h> header file. */
+#cmakedefine HAVE_SYS_STAT_H
+
+/* Define to 1 if you have the <sys/time.h> header file. */
+#cmakedefine HAVE_SYS_TIME_H
+
+/* Define to 1 if you have the <sys/types.h> header file. */
+#cmakedefine HAVE_SYS_TYPES_H
+
+/* Define to 1 if you have the <unistd.h> header file. */
+#cmakedefine HAVE_UNISTD_H
+
+/* Define to 1 if you have the `vfork' function. */
+#cmakedefine HAVE_VFORK
+
+/* Define to 1 if you have the <vfork.h> header file. */
+#cmakedefine HAVE_VFORK_H
+
+/* Define to 1 if `fork' works. */
+#cmakedefine HAVE_WORKING_FORK
+
+/* Define to 1 if `vfork' works. */
+#cmakedefine HAVE_WORKING_VFORK
+
+/* Define to the address where bug reports for this package should be sent. */
+#cmakedefine PACKAGE_BUGREPORT
+
+/* Define to the full name of this package. */
+#cmakedefine PACKAGE_NAME
+
+/* Define to the full name and version of this package. */
+#cmakedefine PACKAGE_STRING
+
+/* Define to the one symbol short name of this package. */
+#cmakedefine PACKAGE_TARNAME
+
+/* Define to the home page for this package. */
+#cmakedefine PACKAGE_URL
+
+/* Define to the version of this package. */
+#cmakedefine PACKAGE_VERSION
+
+/* Define as the return type of signal handlers (`int' or `void'). */
+#cmakedefine RETSIGTYPE
+
+/* Define to 1 if you have the ANSI C header files. */
+#cmakedefine STDC_HEADERS
+
+/* Define to 1 if you can safely include both <sys/time.h> and <time.h>. */
+#cmakedefine TIME_WITH_SYS_TIME
+
+/* Define to 1 if your <sys/time.h> declares `struct tm'. */
+#cmakedefine TM_IN_SYS_TIME
+
+/* Define to empty if `const' does not conform to ANSI C. */
+#cmakedefine const
+
+/* Define to `int' if <sys/types.h> does not define. */
+#cmakedefine pid_t
+
+/* Define as `fork' if `vfork' does not work. */
+#cmakedefine vfork
